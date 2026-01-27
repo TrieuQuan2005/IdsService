@@ -1,0 +1,34 @@
+# ======================
+# Python
+# ======================
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ======================
+# Virtual env / IDE
+# ======================
+.venv/
+.idea/
+.vscode/
+
+# ======================
+# Data
+# ======================
+# Ignore ALL raw datasets
+data/raw/
+
+# Allow processed data if you want to commit later
+# (comment dòng dưới nếu KHÔNG muốn commit processed)
+# data/processed/
+
+# ======================
+# ML Models
+# ======================
+models/*.pkl
+
+# ======================
+# OS
+# ======================
+.DS_Store
+Thumbs.db
