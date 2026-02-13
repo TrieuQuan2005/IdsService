@@ -7,3 +7,7 @@ uvicorn
 matplotlib
 seaborn
 tqdm
+scapy
+pydantic
+requests
+ng
