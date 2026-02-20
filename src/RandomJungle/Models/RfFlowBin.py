@@ -1,6 +1,3 @@
-from RandomJungle.Data.FeatureSets import FlowBinaryFeatures
-from RandomJungle.Data.Labels import BinaryLabel
-from RandomJungle.Data.ModelOutputs import BinaryModelOutput
 from src.RandomJungle.Models.BaseRFModel import BaseRFModel
 
 
@@ -13,6 +10,3 @@ class RfFlowBin(BaseRFModel):
             min_samples_leaf = 2,
             class_weight = "balanced_subsample",
         )
-        self.feature = FlowBinaryFeatures()
-        self.contract = BinaryModelOutput()
-        self.label = BinaryLabel()

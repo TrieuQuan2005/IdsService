@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Dict
-from Labels import (
+from src.RandomJungle.Data.Labels import (
     BinaryLabel,
     HostAttackLabel,
     FlowAttackLabel,
