@@ -32,3 +32,5 @@ models/*.pkl
 # ======================
 .DS_Store
 Thumbs.db
+
+*/csv

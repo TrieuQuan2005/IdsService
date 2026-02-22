@@ -2,10 +2,10 @@
 from pathlib import Path
 
 # ===== sửa path tại đây =====
-INPUT_FILE = "flowBenignDownloadD.csv"
+INPUT_FILE = "Benign/HostBenign.csv"
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-OUTPUT_FILE = PROJECT_ROOT / "src/Dataset/flowBenignLabeled.csv"
-LABEL_NAME = "BENIGN"
+OUTPUT_FILE = PROJECT_ROOT / "src/Dataset/Benign/HostBenign.csv"
+LABEL_NAME = "Benign"
 LABEL_COLUMN = "Label"
 # ============================
 
