@@ -1,12 +1,12 @@
 ﻿import os
 import pandas as pd
-import numpy as np
 
 from RandomJungle.Models.RfFlowBin import RfFlowBin
 from RandomJungle.Models.RfFlowMulti import RfFlowMulti
 from RandomJungle.Models.RfHostBin import RfHostBin
 from RandomJungle.Models.RfHostMulti import RfHostMulti
 
+from RandomJungle.Data.FeatureSets import FlowMultiFeatures, FlowBinaryFeatures, HostBinaryFeatures, HostMultiFeatures
 
 class RfTrainer:
 
@@ -32,7 +32,7 @@ class RfTrainer:
 
         print("Training Host Binary...")
 
-        X = self.df[self._host_binary_columns()].values
+        X = self.df[HostBinaryFeatures.feature_names()].values
         y = (self.df["Label"] != "BENIGN").astype(int).values
 
         self.hostBin.fit(X, y)
@@ -45,7 +45,7 @@ class RfTrainer:
 
         print("Training Flow Binary...")
 
-        X = self.df[self._flow_binary_columns()].values
+        X = self.df[FlowBinaryFeatures.feature_names()].values
         y = (self.df["Label"] != "Benign").astype(int).values
 
         self.flowBin.fit(X, y)
@@ -60,7 +60,7 @@ class RfTrainer:
 
         df_host = self.df[self.df["Label"].isin(["PortScan", "Brute Force"])]
 
-        X = df_host[self._host_multi_columns()].values
+        X = df_host[HostMultiFeatures.feature_names()].values
 
         y = df_host["Label"].map({
             "PortScan": 0,
@@ -79,7 +79,7 @@ class RfTrainer:
 
         df_flow = self.df[self.df["Label"].str.contains("DoS|DDoS", na=False)]
 
-        X = df_flow[self._flow_multi_columns()].values
+        X = df_flow[FlowMultiFeatures.feature_names()].values
 
         y = df_flow["Label"].apply(
             lambda x: 1 if "DDoS" in x else 0
@@ -92,57 +92,9 @@ class RfTrainer:
 
     # TRAIN ALL
     def train_all(self):
-
-        print("=== START TRAINING ALL MODELS ===")
-
         self.train_host_binary()
         self.train_flow_binary()
         self.train_host_multi()
         self.train_flow_multi()
 
-        print("=== ALL MODELS TRAINED SUCCESSFULLY ===")
-
-    # FEATURE COLUMN DEFINITIONS
-    @staticmethod
-    def _host_binary_columns():
-        return [
-            "packets_per_second",
-            "unique_dst_ports",
-            "port_entropy",
-            "connections_per_second",
-            "failed_connection_ratio",
-            "syn_ratio",
-        ]
-
-    @staticmethod
-    def _flow_binary_columns():
-        return [
-            "packets_per_second",
-            "bytes_per_second",
-            "packet_count",
-            "flow_duration",
-            "forward_ratio",
-            "syn_ratio",
-        ]
-
-    @staticmethod
-    def _host_multi_columns():
-        return [
-            "unique_dst_ports",
-            "port_entropy",
-            "failed_connection_ratio",
-            "connections_per_second",
-            "mean_flow_duration",
-            "syn_ratio",
-        ]
-
-    @staticmethod
-    def _flow_multi_columns():
-        return [
-            "packets_per_second",
-            "bytes_per_second",
-            "packet_count",
-            "forward_ratio",
-            "syn_ratio",
-            "rst_ratio",
-        ]
+        print("ALL MODELS TRAINED SUCCESSFULLY")
