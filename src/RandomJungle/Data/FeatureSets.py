@@ -47,7 +47,6 @@ class FlowBinaryFeatures:
     flow_duration: float
     forward_ratio: float
     syn_ratio: float
-    rst_ratio: float
 
     FEATURE_NAMES: List[str] = (
         "packets_per_second",
@@ -56,7 +55,6 @@ class FlowBinaryFeatures:
         "flow_duration",
         "forward_ratio",
         "syn_ratio",
-        "rst_ratio",
     )
 
     def to_array(self) -> np.ndarray:
@@ -67,7 +65,6 @@ class FlowBinaryFeatures:
             float(self.flow_duration),
             float(self.forward_ratio),
             float(self.syn_ratio),
-            float(self.rst_ratio),
         ], dtype=np.float32)
 
     @staticmethod

@@ -46,7 +46,7 @@ class RfTrainer:
         print("Training Flow Binary...")
 
         X = self.df[self._flow_binary_columns()].values
-        y = (self.df["Label"] != "BENIGN").astype(int).values
+        y = (self.df["Label"] != "Benign").astype(int).values
 
         self.flowBin.fit(X, y)
         self.flowBin.save(os.path.join(self.output_dir, "flowBin.pkl"))
