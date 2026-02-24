@@ -6,7 +6,6 @@ import numpy as np
 
 @dataclass(slots=True)
 class HostBinaryFeatures:
-    packets_per_second: float
     unique_dst_ports: int
     port_entropy: float
     connections_per_second: float

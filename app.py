@@ -49,8 +49,8 @@ class IdsConsoleApp:
         # ==============================
         # Network Config
         # ==============================
-        self.LOCAL_IP = {"192.168.1.165"}
-        self.IFACE = "Ethernet"
+        self.LOCAL_IP = {"192.168.1.78"}
+        self.IFACE = "Wi-Fi"
 
         self.capture = PacketCaptureService(self.IFACE, 10000)
         self.parser = PacketParserService(self.LOCAL_IP)
@@ -142,7 +142,8 @@ class IdsConsoleApp:
             host_bin_output.confidence,
             flow_bin_output.confidence
         )
-
+        print(final_label)
+        print(confidence)
         return final_label, confidence
 
     # MAIN LOOP
