@@ -31,9 +31,7 @@ class DecisionFusion:
         flow_multi: FlowMultiModelOutput | None = None,
     ) -> FinalPredictionLabel:
 
-        # ==============================
         # Normalize None branch
-        # ==============================
         if host_bin is None:
             host_bin = BinaryModelOutput(
                 label=BinaryLabel.BENIGN,
@@ -56,58 +54,35 @@ class DecisionFusion:
                 },
             )
 
-        # ==============================
         # Case 1: Both benign
-        # ==============================
-        if (
-            host_bin.label == BinaryLabel.BENIGN
-            and flow_bin.label == BinaryLabel.BENIGN
-        ):
+        if host_bin.label == BinaryLabel.BENIGN and flow_bin.label == BinaryLabel.BENIGN:
             return FinalPredictionLabel.BENIGN
 
         candidates = []
 
-        # ==============================
         # Host branch
-        # ==============================
-        if (
-            host_bin.label == BinaryLabel.ATTACK
-            and host_multi is not None
-        ):
+        if host_bin.label == BinaryLabel.ATTACK and host_multi is not None:
             candidates.append(host_multi)
 
-        # ==============================
         # Flow branch
-        # ==============================
-        if (
-            flow_bin.label == BinaryLabel.ATTACK
-            and flow_multi is not None
-        ):
+        if flow_bin.label == BinaryLabel.ATTACK and flow_multi is not None:
             candidates.append(flow_multi)
 
-        # ==============================
         # Only one attack branch
-        # ==============================
         if len(candidates) == 1:
             return self._map_to_final(candidates[0])
 
-        # ==============================
         # Both attack → compare confidence
-        # ==============================
         if len(candidates) == 2:
-            if candidates[0].confidence >= candidates[1].confidence:
+            if candidates[0].confidence >= candidates[1].confidence+0.1:  # Add margin to avoid ties
                 return self._map_to_final(candidates[0])
             else:
                 return self._map_to_final(candidates[1])
 
-        # ==============================
         # Fallback
-        # ==============================
         return FinalPredictionLabel.BENIGN
 
-    # ==========================================================
     # Map multi-class output → FinalPredictionLabel
-    # ==========================================================
     @staticmethod
     def _map_to_final(multi_output) -> FinalPredictionLabel:
 
