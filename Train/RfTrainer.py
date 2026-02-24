@@ -33,7 +33,7 @@ class RfTrainer:
         print("Training Host Binary...")
 
         X = self.df[HostBinaryFeatures.FEATURE_NAMES].values
-        y = (self.df["Label"] != "BENIGN").astype(int).values
+        y = (self.df["Label"] != "Benign").astype(int).values
 
         self.hostBin.fit(X, y)
         self.hostBin.save(os.path.join(self.output_dir, "hostBin.pkl"))
@@ -72,29 +72,20 @@ class RfTrainer:
 
         print("Host Multi trained.")
 
-    # FLOW MULTI (DoS / DDoS)
     def train_flow_multi(self):
 
         print("Training Flow Multi...")
 
-        df_flow = self.df[self.df["Label"].str.contains("DoS|DDoS", na=False)]
+        df_flow = self.df[self.df["Label"].isin(["TcpFlood", "UdpFlood"])]
 
         X = df_flow[FlowMultiFeatures.FEATURE_NAMES].values
 
-        y = df_flow["Label"].apply(
-            lambda x: 1 if "DDoS" in x else 0
-        ).values
+        y = df_flow["Label"].map({
+            "TcpFlood": 0,
+            "UdpFlood": 1
+        }).values
 
         self.flowMulti.fit(X, y)
         self.flowMulti.save(os.path.join(self.output_dir, "flowMulti.pkl"))
 
         print("Flow Multi trained.")
-
-    # TRAIN ALL
-    def train_all(self):
-        self.train_host_binary()
-        self.train_flow_binary()
-        self.train_host_multi()
-        self.train_flow_multi()
-
-        print("ALL MODELS TRAINED SUCCESSFULLY")

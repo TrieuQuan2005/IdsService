@@ -15,12 +15,11 @@ class BinaryModelOutput:
 
     @staticmethod
     def from_proba(probs):
-        attack_prob = float(probs[1])
         benign_prob = float(probs[0])
+        attack_prob = float(probs[1])
 
         label = (
-            BinaryLabel.ATTACK
-            if attack_prob >= benign_prob
+            BinaryLabel.ATTACK if attack_prob >= benign_prob
             else BinaryLabel.BENIGN
         )
 

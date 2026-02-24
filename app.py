@@ -69,9 +69,7 @@ class IdsConsoleApp:
         self.host_window = HostSlidingWindowService(window_size=10)
         self.host_extractor = HostFeatureExtractService(window_size=10)
 
-        # ==============================
         # Reader + Core
-        # ==============================
         self.reader = NetworkReader(
             self.capture,
             self.parser,
@@ -86,45 +84,66 @@ class IdsConsoleApp:
         self.preprocessor = Preprocessor()
         self.fusion = DecisionFusion()
 
-        print("🚀 IDS Ready.\n")
+        print("IDS Ready.\n")
 
-    # ==========================================================
-    # FLOW PREDICTION
-    # ==========================================================
-    def predict_flow(self, host_features, flow_features):
+    # HYBRID PREDICTION
+    def predict_hybrid(self, host_features, flow_features):
 
         # ---------- Preprocess ----------
         host_bin_f, flow_bin_f, host_multi_f, flow_multi_f = \
             self.preprocessor.transform(host_features, flow_features)
 
+        # Convert to numpy
+        host_bin_array = np.array(
+            list(asdict(host_bin_f).values())
+        ).reshape(1, -1)
+
         flow_bin_array = np.array(
             list(asdict(flow_bin_f).values())
+        ).reshape(1, -1)
+
+        host_multi_array = np.array(
+            list(asdict(host_multi_f).values())
         ).reshape(1, -1)
 
         flow_multi_array = np.array(
             list(asdict(flow_multi_f).values())
         ).reshape(1, -1)
 
-        # ---------- Binary Stage ----------
-        bin_probs = self.flow_bin.model.predict_proba(flow_bin_array)[0]
-        flow_bin_output = BinaryModelOutput.from_proba(bin_probs)
+        # ---------------- BINARY STAGE -----------------------
+        host_bin_probs = self.host_bin.model.predict_proba(host_bin_array)[0]
+        flow_bin_probs = self.flow_bin.model.predict_proba(flow_bin_array)[0]
 
+        host_bin_output = BinaryModelOutput.from_proba(host_bin_probs)
+        flow_bin_output = BinaryModelOutput.from_proba(flow_bin_probs)
+
+        # ---------------- MULTI STAGE ------------------------
+        host_multi_output = None
         flow_multi_output = None
 
-        # ---------- Multi Stage ----------
-        if flow_bin_output.label.value == 1:  # ATTACK
-            multi_probs = self.flow_multi.model.predict_proba(flow_multi_array)[0]
-            flow_multi_output = FlowMultiModelOutput.from_proba(multi_probs)
+        # Nếu ít nhất 1 model binary báo ATTACK
+        if host_bin_output.label.value == 1 or flow_bin_output.label.value == 1:
+            host_multi_probs = self.host_multi.model.predict_proba(host_multi_array)[0]
+            flow_multi_probs = self.flow_multi.model.predict_proba(flow_multi_array)[0]
 
-        # ---------- Fusion ----------
+            host_multi_output = FlowMultiModelOutput.from_proba(host_multi_probs)
+            flow_multi_output = FlowMultiModelOutput.from_proba(flow_multi_probs)
+
+        # ---------------- DECISION FUSION --------------------
         final_label = self.fusion.fuse(
-            host_bin=None,
+            host_bin=host_bin_output,
             flow_bin=flow_bin_output,
-            host_multi=None,
+            host_multi=host_multi_output,
             flow_multi=flow_multi_output
         )
 
-        return final_label, flow_bin_output.confidence
+        # Confidence: lấy max giữa 2 binary
+        confidence = max(
+            host_bin_output.confidence,
+            flow_bin_output.confidence
+        )
+
+        return final_label, confidence
 
     # MAIN LOOP
     def run(self):
@@ -140,25 +159,26 @@ class IdsConsoleApp:
 
                 host_features, flow_features = result
 
-                final_label, confidence = self.predict_flow(
+                final_label, confidence = self.predict_hybrid(
                     host_features,
                     flow_features
                 )
 
-                print(
-                    f"[{time.strftime('%H:%M:%S')}] "
-                    f" {flow_features.flow_key} "
-                    f" {host_features.src_ip}"
-                    f"→ {final_label.name} "
-                    f"(conf={confidence:.2f})"
-                )
+                if final_label.name.upper() != "BENIGN":
+                    print(
+                        f"[{time.strftime('%H:%M:%S')}] "
+                        f" {flow_features.flow_key} "
+                        f" {host_features.src_ip}"
+                        f"→ {final_label.name} "
+                        f"(conf={confidence:.2f})"
+                    )
 
             except KeyboardInterrupt:
-                print("\n🛑 IDS Stopped.")
+                print("\nIDS Stopped.")
                 break
 
             except Exception as e:
-                print("❌ Error:", e)
+                print("Error:", e)
 
 
 if __name__ == "__main__":

@@ -15,7 +15,6 @@ class HostBinaryFeatures:
     mean_flow_duration: float
 
     FEATURE_NAMES  = [
-        "packets_per_second",
         "unique_dst_ports",
         "port_entropy",
         "connections_per_second",
@@ -49,7 +48,7 @@ class FlowBinaryFeatures:
         "packets_per_second",
         "bytes_per_second",
         "packet_count",
-        "flow_duration",
+        "inter_arrival_variance",
         "forward_ratio",
         "syn_ratio",
     ]

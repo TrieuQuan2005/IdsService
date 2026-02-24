@@ -36,6 +36,8 @@ class Preprocessor:
 
         return host_bin, flow_bin, host_multi, flow_multi
 
+
+    # Internal method
     def _build_host_binary(self, h: HostFeatureVector) -> HostBinaryFeatures:
         return HostBinaryFeatures(
             packets_per_second=self._clean_numeric(h.packets_per_second),
