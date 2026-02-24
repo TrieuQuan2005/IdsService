@@ -25,7 +25,6 @@ class HostBinaryFeatures:
 
     def to_array(self) -> np.ndarray:
         return np.array([
-            float(self.packets_per_second),
             float(self.unique_dst_ports),
             float(self.port_entropy),
             float(self.connections_per_second),
