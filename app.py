@@ -17,8 +17,7 @@ from NetworkReader.NetworkReaderPipeLine import NetworkReader
 
 from RandomJungle.Data.ModelOutputs import (
     BinaryModelOutput,
-    FlowMultiModelOutput,
-    HostMultiModelOutput
+    FlowMultiModelOutput, HostMultiModelOutput
 )
 
 from RandomJungle.Preprocessor import Preprocessor
@@ -101,16 +100,28 @@ class IdsConsoleApp:
         host_bin_output = BinaryModelOutput.from_proba(self.host_bin.predict_proba(host_bin_array)[0])
         flow_bin_output = BinaryModelOutput.from_proba(self.flow_bin.predict_proba(flow_bin_array)[0])
 
+        print("host_bin_proba:", self.host_bin.predict_proba(host_bin_array)[0])
+        print("flow_bin_proba:", self.flow_bin.predict_proba(flow_bin_array)[0])
+        print("host_bin_label:", host_bin_output.label)
+        print("flow_bin_label:", flow_bin_output.label)
+
+
         host_multi_output = None
         flow_multi_output = None
 
         if host_bin_output.label.value == 1 or flow_bin_output.label.value == 1:
-            host_multi_output = HostMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0])
+            host_multi_output = HostMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0],self.host_multi.model.classes_)
             flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0])
 
         print(f"Stage 1 - Binary Outputs: {host_bin_output.label.name} / {flow_bin_output.label.name}")
         print(f"host_bin_output: {host_bin_output.label.name}")
         print(f"flow_bin_output: {flow_bin_output.label.name}")
+
+        print("HostMulti label:", host_multi_output.label)
+        print("HostMulti type:", type(host_multi_output.label))
+
+        print("HostMulti model classes:", self.host_multi.model.classes_)
+        print("FlowMulti model classes:", self.flow_multi.model.classes_)
 
         final_label = self.fusion.fuse(
             host_bin_output=host_bin_output,
@@ -153,6 +164,7 @@ class IdsConsoleApp:
                         f"→ {final_label.name} "
                         f"(conf={confidence:.2f})"
                     )
+                    print("\n")
 
             except KeyboardInterrupt:
                 print("\nIDS Stopped.")

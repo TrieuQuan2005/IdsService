@@ -104,8 +104,8 @@ class NetworkPipeline:
 
         # CSV writer
         self.writer = DatasetWriter(
-            flow_path="flowBenignGame.csv",
-            host_path="host_BenignGame.csv"
+            flow_path="FlowSsh01.csv",
+            host_path="HostSsh01.csv"
         )
 
     # =====================================================
@@ -183,8 +183,8 @@ class NetworkPipeline:
 # =========================================================
 if __name__ == "__main__":
 
-    LOCAL_IP = {"192.168.1.165"}   # chỉnh lại nếu IP đổi
-    IFACE = "Ethernet"             # đổi nếu dùng WiFi
+    LOCAL_IP = {"192.168.1.78"}   # chỉnh lại nếu IP đổi
+    IFACE = "Wi-Fi"             # đổi nếu dùng WiFi
 
     # I/O
     capture = PacketCaptureService(IFACE, 10000)
@@ -211,4 +211,4 @@ if __name__ == "__main__":
         host_extractor
     )
 
-    pipe.run(900)
+    pipe.run(1500)
