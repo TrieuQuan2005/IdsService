@@ -42,6 +42,4 @@ def process_all_csv(root_folder: str):
                 file_path = os.path.join(root, file)
                 clean_and_shuffle_csv(file_path)
 
-process_all_csv("BruteForce")
-process_all_csv("DoS")
-process_all_csv("PortScan")
+process_all_csv("../Helper")
