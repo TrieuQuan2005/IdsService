@@ -9,12 +9,12 @@ class HostAttackLabel(IntEnum):
     BRUTE_FORCE = 1
 
 class FlowAttackLabel(IntEnum):
-    DOS = 0
-    DDOS = 1
+    TcpFlood = 0
+    UdpFlood = 1
 
 class FinalPredictionLabel(IntEnum):
     BENIGN = 0
     PORT_SCAN = 1
     BRUTE_FORCE = 2
-    DOS = 3
-    DDOS = 4
+    TcpFlood = 3
+    UdpFlood = 4

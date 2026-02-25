@@ -72,17 +72,17 @@ class FlowMultiModelOutput:
         p_ddos = float(probs[1])
 
         if p_dos >= p_ddos:
-            label = FlowAttackLabel.DOS
+            label = FlowAttackLabel.TcpFlood
             confidence = p_dos
         else:
-            label = FlowAttackLabel.DDOS
+            label = FlowAttackLabel.UdpFlood
             confidence = p_ddos
 
         return FlowMultiModelOutput(
             label=label,
             confidence=confidence,
             probabilities={
-                FlowAttackLabel.DOS: p_dos,
-                FlowAttackLabel.DDOS: p_ddos,
+                FlowAttackLabel.TcpFlood: p_dos,
+                FlowAttackLabel.UdpFlood: p_ddos,
             }
         )

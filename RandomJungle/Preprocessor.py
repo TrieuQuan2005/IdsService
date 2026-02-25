@@ -40,7 +40,6 @@ class Preprocessor:
     # Internal method
     def _build_host_binary(self, h: HostFeatureVector) -> HostBinaryFeatures:
         return HostBinaryFeatures(
-            packets_per_second=self._clean_numeric(h.packets_per_second),
             unique_dst_ports=self._clean_int(h.unique_dst_ports),
             port_entropy=self._clean_numeric(h.port_entropy, 0.0, 15.0),
             connections_per_second=self._clean_numeric(h.connections_per_second),

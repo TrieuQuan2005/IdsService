@@ -142,8 +142,7 @@ class IdsConsoleApp:
             host_bin_output.confidence,
             flow_bin_output.confidence
         )
-        print(final_label)
-        print(confidence)
+
         return final_label, confidence
 
     # MAIN LOOP

@@ -58,14 +58,19 @@ class RfTrainer:
 
         print("Training Host Multi...")
 
-        df_host = self.df[self.df["Label"].isin(["PortScan", "Brute Force"])]
+        df_host = self.df[self.df["Label"].isin(["PortScan", "BruteForce"])]
 
         X = df_host[HostMultiFeatures.FEATURE_NAMES].values
+        # y = df_host["Label"].map({
+        #     "PortScan": 0,
+        #     "Brute Force": 1
+        # }).values
+        df_host["Label"] = df_host["Label"].astype("object")
 
         y = df_host["Label"].map({
             "PortScan": 0,
-            "Brute Force": 1
-        }).values
+            "BruteForce": 1
+        }).to_numpy()
 
         self.hostMulti.fit(X, y)
         self.hostMulti.save(os.path.join(self.output_dir, "hostMulti.pkl"))

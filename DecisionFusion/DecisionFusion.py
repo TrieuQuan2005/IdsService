@@ -74,7 +74,7 @@ class DecisionFusion:
 
         # Both attack → compare confidence
         if len(candidates) == 2:
-            if candidates[0].confidence >= candidates[1].confidence+0.1:  # Add margin to avoid ties
+            if candidates[0].confidence >= candidates[1].confidence+0 :  # Add margin to avoid ties
                 return self._map_to_final(candidates[0])
             else:
                 return self._map_to_final(candidates[1])
@@ -96,10 +96,10 @@ class DecisionFusion:
 
         if isinstance(multi_output, FlowMultiModelOutput):
 
-            if multi_output.label == FlowAttackLabel.DOS:
-                return FinalPredictionLabel.DOS
+            if multi_output.label == FlowAttackLabel.TcpFlood:
+                return FinalPredictionLabel.TcpFlood
 
-            if multi_output.label == FlowAttackLabel.DDOS:
-                return FinalPredictionLabel.DDOS
+            if multi_output.label == FlowAttackLabel.UdpFlood:
+                return FinalPredictionLabel.UdpFlood
 
         return FinalPredictionLabel.BENIGN
