@@ -25,38 +25,38 @@ class DecisionFusion:
         # Normalize None branch
         if host_bin_output is None:
             host_bin_output = BinaryModelOutput(
-                label=BinaryLabel.BENIGN,
+                label=BinaryLabel.Benign,
                 confidence=1.0,
                 attack_probability=0.0,
                 probabilities={
-                    BinaryLabel.BENIGN: 1.0,
-                    BinaryLabel.ATTACK: 0.0,
+                    BinaryLabel.Benign: 1.0,
+                    BinaryLabel.Attack: 0.0,
                 },
             )
 
         if flow_bin_output is None:
             flow_bin_output = BinaryModelOutput(
-                label=BinaryLabel.BENIGN,
+                label=BinaryLabel.Benign,
                 confidence=1.0,
                 attack_probability=0.0,
                 probabilities={
-                    BinaryLabel.BENIGN: 1.0,
-                    BinaryLabel.ATTACK: 0.0,
+                    BinaryLabel.Benign: 1.0,
+                    BinaryLabel.Attack: 0.0,
                 },
             )
 
         # Case 1: Both benign
-        if host_bin_output.label == BinaryLabel.BENIGN and flow_bin_output.label == BinaryLabel.BENIGN:
-            return FinalPredictionLabel.BENIGN
+        if host_bin_output.label == BinaryLabel.Benign and flow_bin_output.label == BinaryLabel.Benign:
+            return FinalPredictionLabel.Benign
 
         candidates = []
 
         # Host branch
-        if host_bin_output.label == BinaryLabel.ATTACK and host_multi_output is not None:
+        if host_bin_output.label == BinaryLabel.Attack and host_multi_output is not None:
             candidates.append(host_multi_output)
 
         # Flow branch
-        if flow_bin_output.label == BinaryLabel.ATTACK and flow_multi_output is not None:
+        if flow_bin_output.label == BinaryLabel.Attack and flow_multi_output is not None:
             candidates.append(flow_multi_output)
 
         # Only one attack branch
@@ -71,7 +71,7 @@ class DecisionFusion:
                 return self._map_to_final(candidates[1])
 
         # Fallback
-        return FinalPredictionLabel.BENIGN
+        return FinalPredictionLabel.Benign
 
     # Map multi-class output → FinalPredictionLabel
     @staticmethod
@@ -93,4 +93,4 @@ class DecisionFusion:
             if multi_output.label == FlowAttackLabel.UdpFlood:
                 return FinalPredictionLabel.UdpFlood
 
-        return FinalPredictionLabel.BENIGN
+        return FinalPredictionLabel.Benign

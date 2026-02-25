@@ -17,7 +17,8 @@ from NetworkReader.NetworkReaderPipeLine import NetworkReader
 
 from RandomJungle.Data.ModelOutputs import (
     BinaryModelOutput,
-    FlowMultiModelOutput
+    FlowMultiModelOutput,
+    HostMultiModelOutput
 )
 
 from RandomJungle.Preprocessor import Preprocessor
@@ -104,12 +105,13 @@ class IdsConsoleApp:
         flow_multi_output = None
 
         if host_bin_output.label.value == 1 or flow_bin_output.label.value == 1:
-            host_multi_output = FlowMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0])
+            host_multi_output = HostMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0])
             flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0])
 
-        print(f"Stage 1 - Binary Outputs: {host_bin_output.label.value} / {flow_bin_output.label.value}")
-        print(f"host_bin_output: {host_bin_output.label.value}")
-        print(f"flow_bin_output: {flow_bin_output.label.value}")
+        print(f"Stage 1 - Binary Outputs: {host_bin_output.label.name} / {flow_bin_output.label.name}")
+        print(f"host_bin_output: {host_bin_output.label.name}")
+        print(f"flow_bin_output: {flow_bin_output.label.name}")
+
         final_label = self.fusion.fuse(
             host_bin_output=host_bin_output,
             flow_bin_output=flow_bin_output,

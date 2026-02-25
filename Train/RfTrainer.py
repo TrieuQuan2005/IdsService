@@ -53,23 +53,27 @@ class RfTrainer:
 
         print("Flow Binary trained.")
 
-    # HOST MULTI (PortScan / BruteForce)
+    # HOST MULTI (SynScan, UdpScan, FullScan, BruteForce)
     def train_host_multi(self):
 
         print("Training Host Multi...")
 
-        df_host = self.df[self.df["Label"].isin(["PortScan", "BruteForce"])]
+        df_host = self.df[self.df["Label"].isin([
+            "SynScan",
+            "UdpScan",
+            "FullScan",
+            "BruteForce"
+        ])]
 
         X = df_host[HostMultiFeatures.FEATURE_NAMES].values
-        # y = df_host["Label"].map({
-        #     "PortScan": 0,
-        #     "Brute Force": 1
-        # }).values
+
         df_host["Label"] = df_host["Label"].astype("object")
 
         y = df_host["Label"].map({
-            "PortScan": 0,
-            "BruteForce": 1
+            "SynScan": 0,
+            "UdpScan": 1,
+            "FullScan": 2,
+            "BruteForce": 3
         }).to_numpy()
 
         self.hostMulti.fit(X, y)
