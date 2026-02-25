@@ -13,27 +13,18 @@ from RandomJungle.Data.ModelOutputs import (
 
 
 class DecisionFusion:
-    """
-    Decision Fusion Logic
-
-    Rule:
-    1. Nếu cả 2 Binary = BENIGN → BENIGN
-    2. Nếu 1 nhánh ATTACK → chọn nhánh đó
-    3. Nếu cả 2 ATTACK → chọn nhánh có confidence cao hơn
-    4. Không crash nếu 1 nhánh None
-    """
 
     def fuse(
         self,
-        host_bin: BinaryModelOutput | None,
-        flow_bin: BinaryModelOutput | None,
-        host_multi: HostMultiModelOutput | None = None,
-        flow_multi: FlowMultiModelOutput | None = None,
+        host_bin_output: BinaryModelOutput | None,
+        flow_bin_output: BinaryModelOutput | None,
+        host_multi_output: HostMultiModelOutput | None = None,
+        flow_multi_output: FlowMultiModelOutput | None = None,
     ) -> FinalPredictionLabel:
 
         # Normalize None branch
-        if host_bin is None:
-            host_bin = BinaryModelOutput(
+        if host_bin_output is None:
+            host_bin_output = BinaryModelOutput(
                 label=BinaryLabel.BENIGN,
                 confidence=1.0,
                 attack_probability=0.0,
@@ -43,8 +34,8 @@ class DecisionFusion:
                 },
             )
 
-        if flow_bin is None:
-            flow_bin = BinaryModelOutput(
+        if flow_bin_output is None:
+            flow_bin_output = BinaryModelOutput(
                 label=BinaryLabel.BENIGN,
                 confidence=1.0,
                 attack_probability=0.0,
@@ -55,18 +46,18 @@ class DecisionFusion:
             )
 
         # Case 1: Both benign
-        if host_bin.label == BinaryLabel.BENIGN and flow_bin.label == BinaryLabel.BENIGN:
+        if host_bin_output.label == BinaryLabel.BENIGN and flow_bin_output.label == BinaryLabel.BENIGN:
             return FinalPredictionLabel.BENIGN
 
         candidates = []
 
         # Host branch
-        if host_bin.label == BinaryLabel.ATTACK and host_multi is not None:
-            candidates.append(host_multi)
+        if host_bin_output.label == BinaryLabel.ATTACK and host_multi_output is not None:
+            candidates.append(host_multi_output)
 
         # Flow branch
-        if flow_bin.label == BinaryLabel.ATTACK and flow_multi is not None:
-            candidates.append(flow_multi)
+        if flow_bin_output.label == BinaryLabel.ATTACK and flow_multi_output is not None:
+            candidates.append(flow_multi_output)
 
         # Only one attack branch
         if len(candidates) == 1:
@@ -74,7 +65,7 @@ class DecisionFusion:
 
         # Both attack → compare confidence
         if len(candidates) == 2:
-            if candidates[0].confidence >= candidates[1].confidence+0 :  # Add margin to avoid ties
+            if candidates[0].confidence >= candidates[1].confidence:
                 return self._map_to_final(candidates[0])
             else:
                 return self._map_to_final(candidates[1])

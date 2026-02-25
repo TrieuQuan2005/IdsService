@@ -90,54 +90,33 @@ class IdsConsoleApp:
     def predict_hybrid(self, host_features, flow_features):
 
         # ---------- Preprocess ----------
-        host_bin_f, flow_bin_f, host_multi_f, flow_multi_f = \
-            self.preprocessor.transform(host_features, flow_features)
+        host_bin_f, flow_bin_f, host_multi_f, flow_multi_f = self.preprocessor.transform(host_features, flow_features)
 
-        # Convert to numpy
-        host_bin_array = np.array(
-            list(asdict(host_bin_f).values())
-        ).reshape(1, -1)
+        host_bin_array = np.array(list(asdict(host_bin_f).values())).reshape(1, -1)
+        flow_bin_array = np.array(list(asdict(flow_bin_f).values())).reshape(1, -1)
+        host_multi_array = np.array(list(asdict(host_multi_f).values())).reshape(1, -1)
+        flow_multi_array = np.array(list(asdict(flow_multi_f).values())).reshape(1, -1)
 
-        flow_bin_array = np.array(
-            list(asdict(flow_bin_f).values())
-        ).reshape(1, -1)
+        host_bin_output = BinaryModelOutput.from_proba(self.host_bin.predict_proba(host_bin_array)[0])
+        flow_bin_output = BinaryModelOutput.from_proba(self.flow_bin.predict_proba(flow_bin_array)[0])
 
-        host_multi_array = np.array(
-            list(asdict(host_multi_f).values())
-        ).reshape(1, -1)
-
-        flow_multi_array = np.array(
-            list(asdict(flow_multi_f).values())
-        ).reshape(1, -1)
-
-        # ---------------- BINARY STAGE -----------------------
-        host_bin_probs = self.host_bin.model.predict_proba(host_bin_array)[0]
-        flow_bin_probs = self.flow_bin.model.predict_proba(flow_bin_array)[0]
-
-        host_bin_output = BinaryModelOutput.from_proba(host_bin_probs)
-        flow_bin_output = BinaryModelOutput.from_proba(flow_bin_probs)
-
-        # ---------------- MULTI STAGE ------------------------
         host_multi_output = None
         flow_multi_output = None
 
-        # Nếu ít nhất 1 model binary báo ATTACK
         if host_bin_output.label.value == 1 or flow_bin_output.label.value == 1:
-            host_multi_probs = self.host_multi.model.predict_proba(host_multi_array)[0]
-            flow_multi_probs = self.flow_multi.model.predict_proba(flow_multi_array)[0]
+            host_multi_output = FlowMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0])
+            flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0])
 
-            host_multi_output = FlowMultiModelOutput.from_proba(host_multi_probs)
-            flow_multi_output = FlowMultiModelOutput.from_proba(flow_multi_probs)
-
-        # ---------------- DECISION FUSION --------------------
+        print(f"Stage 1 - Binary Outputs: {host_bin_output.label.value} / {flow_bin_output.label.value}")
+        print(f"host_bin_output: {host_bin_output.label.value}")
+        print(f"flow_bin_output: {flow_bin_output.label.value}")
         final_label = self.fusion.fuse(
-            host_bin=host_bin_output,
-            flow_bin=flow_bin_output,
-            host_multi=host_multi_output,
-            flow_multi=flow_multi_output
+            host_bin_output=host_bin_output,
+            flow_bin_output=flow_bin_output,
+            host_multi_output=host_multi_output,
+            flow_multi_output=flow_multi_output
         )
 
-        # Confidence: lấy max giữa 2 binary
         confidence = max(
             host_bin_output.confidence,
             flow_bin_output.confidence
