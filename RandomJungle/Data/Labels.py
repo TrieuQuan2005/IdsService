@@ -1,20 +1,27 @@
 from enum import IntEnum
 
 class BinaryLabel(IntEnum):
-    BENIGN = 0
-    ATTACK = 1
+    Benign = 0
+    Attack = 1
 
 class HostAttackLabel(IntEnum):
-    PORT_SCAN = 0
-    BRUTE_FORCE = 1
+    SynScan = 0
+    UdpScan = 1
+    FullScan =2
+    BruteForce = 3
 
 class FlowAttackLabel(IntEnum):
     TcpFlood = 0
     UdpFlood = 1
 
 class FinalPredictionLabel(IntEnum):
-    BENIGN = 0
-    PORT_SCAN = 1
-    BRUTE_FORCE = 2
-    TcpFlood = 3
-    UdpFlood = 4
+    Benign = 0
+
+    TcpFlood = 1
+    UdpFlood = 2
+
+    SynScan = 3
+    UdpScan = 4
+    FullScan = 5
+    BruteForce = 6
+
