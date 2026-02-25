@@ -79,11 +79,17 @@ class DecisionFusion:
 
         if isinstance(multi_output, HostMultiModelOutput):
 
-            if multi_output.label == HostAttackLabel.PORT_SCAN:
-                return FinalPredictionLabel.PORT_SCAN
+            if multi_output.label == HostAttackLabel.SynScan:
+                return FinalPredictionLabel.SynScan
 
-            if multi_output.label == HostAttackLabel.BRUTE_FORCE:
-                return FinalPredictionLabel.BRUTE_FORCE
+            if multi_output.label == HostAttackLabel.UdpScan:
+                return FinalPredictionLabel.UdpScan
+
+            if multi_output.label == HostAttackLabel.FullScan:
+                return FinalPredictionLabel.FullScan
+
+            if multi_output.label == HostAttackLabel.BruteForce:
+                return FinalPredictionLabel.BruteForce
 
         if isinstance(multi_output, FlowMultiModelOutput):
 
