@@ -71,6 +71,14 @@ class Evaluation:
         self.host_window = HostSlidingWindowService(window_size=10)
         self.host_extractor = HostFeatureExtractService(window_size=10)
 
+        # Session Configuration
+        self.session_label = "DOS"  # hoặc BENIGN
+        self.evaluation_duration = 60  # giây
+
+        self.sample_count = 0
+        self.start_time = None
+
+
         # Reader
         self.reader = NetworkReader(
             self.capture,
@@ -139,37 +147,52 @@ class Evaluation:
 
         return final_label, confidence
 
-    # PRINT METRICS
     def print_metrics(self):
 
-        if len(self.y_true) == 0:
-            print("No ground truth available.")
+        if self.sample_count == 0:
+            print("No samples collected.")
             return
 
-        print("\n========== IDS Evaluation ==========")
+        print("\n========== SESSION RESULT ==========")
+        print(f"Total Samples: {self.sample_count}")
 
-        print("Accuracy:", accuracy_score(self.y_true, self.y_pred))
-        print("Precision:", precision_score(self.y_true, self.y_pred, average="binary"))
-        print("Recall:", recall_score(self.y_true, self.y_pred, average="binary"))
-        print("F1 Score:", f1_score(self.y_true, self.y_pred, average="binary"))
+        # Binary conversion
+        y_true_bin = [0 if y == "BENIGN" else 1 for y in self.y_true]
+        y_pred_bin = [0 if y == "BENIGN" else 1 for y in self.y_pred]
+
+        acc = accuracy_score(y_true_bin, y_pred_bin)
+        pre = precision_score(y_true_bin, y_pred_bin)
+        rec = recall_score(y_true_bin, y_pred_bin)
+        f1 = f1_score(y_true_bin, y_pred_bin)
+
+        print(f"Accuracy : {acc:.4f}")
+        print(f"Precision: {pre:.4f}")
+        print(f"Recall   : {rec:.4f}")
+        print(f"F1 Score : {f1:.4f}")
 
         print("\nConfusion Matrix:")
-        print(confusion_matrix(self.y_true, self.y_pred))
-
-        print("\nClassification Report:")
-        print(classification_report(self.y_true, self.y_pred))
+        print(confusion_matrix(y_true_bin, y_pred_bin))
 
         print("=====================================\n")
 
-    # ==============================
     # MAIN LOOP
-    # ==============================
     def run(self):
 
-        print("🟢 Monitoring started...\n")
+        print("🟢 Evaluation Started")
+        print(f"Session Label: {self.session_label}")
+        print(f"Duration: {self.evaluation_duration}s\n")
+
         self.capture.start()
+        self.start_time = time.time()
 
         while True:
+
+            # Dừng khi hết thời gian
+            if time.time() - self.start_time >= self.evaluation_duration:
+                print("\nEvaluation Finished.")
+                self.print_metrics()
+                break
+
             try:
                 result = self.reader.read()
 
@@ -180,30 +203,18 @@ class Evaluation:
                     host_features, flow_features, true_label = result
                 else:
                     host_features, flow_features = result
-                    true_label = None
+                    true_label = self.session_label  # fallback theo config
 
                 final_label, confidence = self.predict_hybrid(
                     host_features,
                     flow_features
                 )
 
-                if true_label is not None:
-                    self.y_true.append(true_label)
-                    self.y_pred.append(final_label.name)
+                # Lưu dữ liệu đánh giá
+                self.y_true.append(true_label.upper())
+                self.y_pred.append(final_label.name.upper())
 
-                if final_label.name.upper() != "BENIGN":
-                    print(
-                        f"[{time.strftime('%H:%M:%S')}] "
-                        f"{flow_features.flow_key} "
-                        f"{host_features.src_ip} "
-                        f"→ {final_label.name} "
-                        f"(conf={confidence:.2f})"
-                    )
-
-            except KeyboardInterrupt:
-                print("\nIDS Stopped.")
-                self.print_metrics()
-                break
+                self.sample_count += 1
 
             except Exception as e:
                 print("Error:", e)
