@@ -14,6 +14,7 @@ from NetworkReader.Services.PacketCaptureService import PacketCaptureService
 from NetworkReader.Services.PacketParserService import PacketParserService
 
 from NetworkReader.NetworkReaderPipeLine import NetworkReader
+from RandomJungle.Data.Labels import FinalPredictionLabel
 
 from RandomJungle.Data.ModelOutputs import (
     BinaryModelOutput,
@@ -104,7 +105,11 @@ class IdsConsoleApp:
             host_multi_output=host_multi_output,
             flow_multi_output=flow_multi_output
         )
-
+        if final_label != FinalPredictionLabel.Benign:
+            print(flow_bin_output.label, flow_bin_output.confidence)
+            print(flow_multi_output.label, flow_multi_output.confidence)
+            print(host_bin_output.label, host_bin_output.confidence)
+            print(host_multi_output.label, flow_multi_output.confidence)
         return final_label, confidence
 
     # MAIN LOOP
@@ -125,15 +130,15 @@ class IdsConsoleApp:
                     host_features,
                     flow_features
                 )
-
-                print(
-                    f"[{time.strftime('%H:%M:%S')}] "
-                    f" {flow_features.flow_key} "
-                    f" {host_features.src_ip}"
-                    f"→ {final_label.name} "
-                    f"(conf={confidence:.2f})"
-                )
-                print("\n")
+                if final_label != FinalPredictionLabel.Benign:
+                    print(
+                        f"[{time.strftime('%H:%M:%S')}] "
+                        f" {flow_features.flow_key} "
+                        f" {host_features.src_ip}"
+                        f"→ {final_label.name} "
+                        f"(conf={confidence:.2f})"
+                    )
+                    print("\n")
 
             except KeyboardInterrupt:
                 print("\nIDS Stopped.")
