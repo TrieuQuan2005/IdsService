@@ -106,10 +106,16 @@ class IdsConsoleApp:
             flow_multi_output=flow_multi_output
         )
         if final_label != FinalPredictionLabel.Benign:
-            print(flow_bin_output.label, flow_bin_output.confidence)
-            print(flow_multi_output.label, flow_multi_output.confidence)
-            print(host_bin_output.label, host_bin_output.confidence)
-            print(host_multi_output.label, flow_multi_output.confidence)
+            print( "Flow bin:", flow_bin_output.label, flow_bin_output.confidence)
+            if flow_multi_output is not None:
+                print("Flow Multi", flow_multi_output.label, flow_multi_output.confidence)
+            else:
+                print("Ko co tan cong o muc flow")
+            print("Host Bin",host_bin_output.label, host_bin_output.confidence)
+            if host_multi_output is not None:
+                print("Host Multi", host_multi_output.label, flow_multi_output.confidence)
+            else:
+                print("Ko co tan cong o muc host")
         return final_label, confidence
 
     # MAIN LOOP
