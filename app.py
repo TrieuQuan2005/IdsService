@@ -48,7 +48,7 @@ class IdsConsoleApp:
         self.LOCAL_IP = {"192.168.1.165"}
         self.IFACE = "Ethernet"
 
-        self.capture = PacketCaptureService(self.IFACE, 10000)
+        self.capture = PacketCaptureService()
         self.parser = PacketParserService(self.LOCAL_IP)
 
         # Flow Pipeline
@@ -93,8 +93,9 @@ class IdsConsoleApp:
         host_multi_output = None
         flow_multi_output = None
 
-        if host_bin_output.label.value == 1 or flow_bin_output.label.value == 1:
+        if host_bin_output.label.value == 1:
             host_multi_output = HostMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0],self.host_multi.model.classes_)
+        if flow_bin_output.label.value == 1:
             flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0])
 
         final_label = self.fusion.fuse(
