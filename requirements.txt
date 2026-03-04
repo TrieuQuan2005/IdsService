@@ -11,3 +11,4 @@ scapy
 pydantic
 requests
 ng
+pydivert

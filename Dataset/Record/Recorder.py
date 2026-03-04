@@ -183,11 +183,11 @@ class NetworkPipeline:
 # =========================================================
 if __name__ == "__main__":
 
-    LOCAL_IP = {"192.168.1.78"}   # chỉnh lại nếu IP đổi
-    IFACE = "Wi-Fi"             # đổi nếu dùng WiFi
+    LOCAL_IP = {"192.168.1.165"}   # chỉnh lại nếu IP đổi
+    IFACE = "Ethernet"             # đổi nếu dùng WiFi
 
     # I/O
-    capture = PacketCaptureService(IFACE, 10000)
+    capture = PacketCaptureService()
     parser = PacketParserService(LOCAL_IP)
 
     # Flow pipeline

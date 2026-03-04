@@ -33,9 +33,7 @@ class IdsConsoleApp:
 
     def __init__(self):
 
-        # ==============================
         # Load ML Models
-        # ==============================
         self.host_bin = RfHostBin()
         self.flow_bin = RfFlowBin()
         self.host_multi = RfHostMulti()
@@ -46,30 +44,23 @@ class IdsConsoleApp:
         self.host_multi.load("Train/hostMulti.pkl")
         self.flow_multi.load("Train/flowMulti.pkl")
 
-        # ==============================
         # Network Config
-        # ==============================
-        self.LOCAL_IP = {"192.168.1.78"}
-        self.IFACE = "Wi-Fi"
+        self.LOCAL_IP = {"192.168.1.165"}
+        self.IFACE = "Ethernet"
 
         self.capture = PacketCaptureService(self.IFACE, 10000)
         self.parser = PacketParserService(self.LOCAL_IP)
 
-        # ==============================
         # Flow Pipeline
-        # ==============================
         self.flow_table = FlowTableService(flow_timeout=30)
         self.flow_window = FlowSlidingWindowService(window_size=10)
         self.flow_extractor = FlowFeatureExtractService(window_size=10)
 
-        # ==============================
         # Host Pipeline
-        # ==============================
         self.host_behavior = HostBehaviorService(host_timeout=30)
         self.host_window = HostSlidingWindowService(window_size=10)
         self.host_extractor = HostFeatureExtractService(window_size=10)
 
-        # Reader + Core
         self.reader = NetworkReader(
             self.capture,
             self.parser,
@@ -86,7 +77,6 @@ class IdsConsoleApp:
 
         print("IDS Ready.\n")
 
-    # HYBRID PREDICTION
     def predict_hybrid(self, host_features, flow_features):
 
         # ---------- Preprocess ----------
@@ -140,14 +130,13 @@ class IdsConsoleApp:
                     flow_features
                 )
 
-                if final_label.name.upper() != "BENIGN":
-                    print(
-                        f"[{time.strftime('%H:%M:%S')}] "
-                        f" {flow_features.flow_key} "
-                        f" {host_features.src_ip}"
-                        f"→ {final_label.name} "
-                        f"(conf={confidence:.2f})"
-                    )
+                print(
+                    f"[{time.strftime('%H:%M:%S')}] "
+                    f" {flow_features.flow_key} "
+                    f" {host_features.src_ip}"
+                    f"→ {final_label.name} "
+                    f"(conf={confidence:.2f})"
+                )
                 print("\n")
 
             except KeyboardInterrupt:
