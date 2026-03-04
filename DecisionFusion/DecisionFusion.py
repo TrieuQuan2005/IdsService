@@ -20,7 +20,7 @@ class DecisionFusion:
         flow_bin_output: BinaryModelOutput | None,
         host_multi_output: HostMultiModelOutput | None = None,
         flow_multi_output: FlowMultiModelOutput | None = None,
-    ) -> FinalPredictionLabel:
+    ) -> tuple[FinalPredictionLabel, float]:
 
         # Normalize None branch
         if host_bin_output is None:
@@ -47,8 +47,7 @@ class DecisionFusion:
 
         # Case 1: Both benign
         if host_bin_output.label == BinaryLabel.Benign and flow_bin_output.label == BinaryLabel.Benign:
-            return FinalPredictionLabel.Benign
-
+            return FinalPredictionLabel.Benign , (host_bin_output.confidence + flow_bin_output.confidence)/2
         candidates = []
 
         # Host branch
@@ -61,17 +60,20 @@ class DecisionFusion:
 
         # Only one attack branch
         if len(candidates) == 1:
-            return self._map_to_final(candidates[0])
+            return self._map_to_final(candidates[0]) , candidates[0].confidence
 
         # Both attack → compare confidence
         if len(candidates) == 2:
-            if candidates[0].confidence >= candidates[1].confidence:
-                return self._map_to_final(candidates[0])
+            host_score = host_bin_output.confidence * host_bin_output.attack_probability
+            flow_score = flow_bin_output.confidence * flow_bin_output.attack_probability
+
+            if host_score >= flow_score:
+                return self._map_to_final(candidates[0]), host_bin_output.confidence
             else:
-                return self._map_to_final(candidates[1])
+                return self._map_to_final(candidates[1]) , flow_bin_output.confidence
 
         # Fallback
-        return FinalPredictionLabel.Benign
+        return FinalPredictionLabel.Suspicious , (host_bin_output.confidence + flow_bin_output.confidence)/2
 
     # Map multi-class output → FinalPredictionLabel
     @staticmethod
@@ -96,4 +98,4 @@ class DecisionFusion:
             if multi_output.label == FlowAttackLabel.UdpFlood:
                 return FinalPredictionLabel.UdpFlood
 
-        return FinalPredictionLabel.Benign
+        return FinalPredictionLabel.Suspicious

@@ -98,16 +98,11 @@ class IdsConsoleApp:
         if flow_bin_output.label.value == 1:
             flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0])
 
-        final_label = self.fusion.fuse(
+        final_label , confidence  = self.fusion.fuse(
             host_bin_output=host_bin_output,
             flow_bin_output=flow_bin_output,
             host_multi_output=host_multi_output,
             flow_multi_output=flow_multi_output
-        )
-
-        confidence = max(
-            host_bin_output.confidence,
-            flow_bin_output.confidence
         )
 
         return final_label, confidence

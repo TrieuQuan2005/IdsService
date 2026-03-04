@@ -25,3 +25,5 @@ class FinalPredictionLabel(IntEnum):
     FullScan = 5
     BruteForce = 6
 
+    Suspicious =7
+
