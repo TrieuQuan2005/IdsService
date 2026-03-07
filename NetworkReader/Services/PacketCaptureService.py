@@ -18,7 +18,7 @@ class PacketCaptureService:
 
     def start(self) -> None:
         self._stop_event.clear()
-        self._divert = pydivert.WinDivert(self.filter_str)
+        self._divert = pydivert.WinDivert(self.filter_str, flags=pydivert.Flag.SNIFF)
         self._divert.open()
 
         self._thread = threading.Thread(target=self._capture_loop, daemon=True)

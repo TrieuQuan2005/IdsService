@@ -1,10 +1,10 @@
-﻿from Train.RfTrainer import RfTrainer
+﻿from RfTrainer import RfTrainer
 from pathlib import Path
 
 def main():
     PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-    dest_dir = PROJECT_ROOT / "RandomJungle/Models"
+    dest_dir = PROJECT_ROOT / "Train"
 
     FlowBinTrainer = RfTrainer(
         str(PROJECT_ROOT / "Dataset/FlowBinDataset.csv"),
