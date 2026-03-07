@@ -15,65 +15,27 @@ from RandomJungle.Data.ModelOutputs import (
 class DecisionFusion:
 
     def fuse(
-        self,
-        host_bin_output: BinaryModelOutput | None,
-        flow_bin_output: BinaryModelOutput | None,
-        host_multi_output: HostMultiModelOutput | None = None,
-        flow_multi_output: FlowMultiModelOutput | None = None,
-    ) -> tuple[FinalPredictionLabel, float]:
+            self,
+            host_bin_output,
+            flow_bin_output,
+            host_multi_output=None,
+            flow_multi_output=None,
+    ):
 
-        # Normalize None branch
-        if host_bin_output is None:
-            host_bin_output = BinaryModelOutput(
-                label=BinaryLabel.Benign,
-                confidence=1.0,
-                attack_probability=0.0,
-                probabilities={
-                    BinaryLabel.Benign: 1.0,
-                    BinaryLabel.Attack: 0.0,
-                },
-            )
+        # Both benign
+        if (host_bin_output.label == BinaryLabel.Benign and
+                flow_bin_output.label == BinaryLabel.Benign):
+            return FinalPredictionLabel.Benign, 1.0
 
-        if flow_bin_output is None:
-            flow_bin_output = BinaryModelOutput(
-                label=BinaryLabel.Benign,
-                confidence=1.0,
-                attack_probability=0.0,
-                probabilities={
-                    BinaryLabel.Benign: 1.0,
-                    BinaryLabel.Attack: 0.0,
-                },
-            )
-
-        # Case 1: Both benign
-        if host_bin_output.label == BinaryLabel.Benign and flow_bin_output.label == BinaryLabel.Benign:
-            return FinalPredictionLabel.Benign , (host_bin_output.confidence + flow_bin_output.confidence)/2
-        candidates = []
-
-        # Host branch
-        if host_bin_output.label == BinaryLabel.Attack and host_multi_output is not None:
-            candidates.append(host_multi_output)
-
-        # Flow branch
+        # Flow attack
         if flow_bin_output.label == BinaryLabel.Attack and flow_multi_output is not None:
-            candidates.append(flow_multi_output)
+            return self._map_to_final(flow_multi_output), flow_multi_output.confidence
 
-        # Only one attack branch
-        if len(candidates) == 1:
-            return self._map_to_final(candidates[0]) , candidates[0].confidence
+        # Host attack
+        if host_bin_output.label == BinaryLabel.Attack and host_multi_output is not None:
+            return self._map_to_final(host_multi_output), host_multi_output.confidence
 
-        # Both attack → compare confidence
-        if len(candidates) == 2:
-            host_score = host_bin_output.confidence * host_bin_output.attack_probability
-            flow_score = flow_bin_output.confidence * flow_bin_output.attack_probability
-
-            if host_score >= flow_score:
-                return self._map_to_final(candidates[0]), host_bin_output.confidence
-            else:
-                return self._map_to_final(candidates[1]) , flow_bin_output.confidence
-
-        # Fallback
-        return FinalPredictionLabel.Suspicious , (host_bin_output.confidence + flow_bin_output.confidence)/2
+        return FinalPredictionLabel.Suspicious, 0.5
 
     # Map multi-class output → FinalPredictionLabel
     @staticmethod
