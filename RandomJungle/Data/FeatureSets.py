@@ -46,7 +46,7 @@ class FlowBinaryFeatures:
         "packets_per_second",
         "bytes_per_second",
         "packet_count",
-        "inter_arrival_variance",
+        "flow_duration",
         "forward_ratio",
         "syn_ratio",
     ]

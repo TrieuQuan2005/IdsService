@@ -39,7 +39,7 @@ def test_flow_multi_numeric_classes():
     classes = [0, 1]
     out = FlowMultiModelOutput.from_proba(probs, classes)
     print('flow_multi_numeric:', out.label, out.confidence)
-    assert out.label == FlowAttackLabel.TcpFlood
+    assert out.label == FlowAttackLabel.SynFlood
 
 
 if __name__ == '__main__':

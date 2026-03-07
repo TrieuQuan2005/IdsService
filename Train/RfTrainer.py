@@ -65,6 +65,15 @@ class RfTrainer:
             "BruteForce"
         ])]
 
+        # diagnostic counts
+        counts = df_host["Label"].value_counts()
+        print('Host multi label counts:\n', counts.to_string())
+
+        unique_labels = counts.index.tolist()
+        if len(unique_labels) < 2:
+            print('Not enough host multi-class labels to train (need >=2). Skipping host multi training.')
+            return
+
         X = df_host[HostMultiFeatures.FEATURE_NAMES].values
 
         df_host["Label"] = df_host["Label"].astype("object")
@@ -85,12 +94,20 @@ class RfTrainer:
 
         print("Training Flow Multi...")
 
-        df_flow = self.df[self.df["Label"].isin(["TcpFlood", "UdpFlood"])]
+        df_flow = self.df[self.df["Label"].isin(["SynFlood", "UdpFlood"])]
+
+        counts = df_flow["Label"].value_counts()
+        print('Flow multi label counts:\n', counts.to_string())
+
+        unique_labels = counts.index.tolist()
+        if len(unique_labels) < 2:
+            print('Not enough flow multi-class labels to train (need >=2). Skipping flow multi training.')
+            return
 
         X = df_flow[FlowMultiFeatures.FEATURE_NAMES].values
 
         y = df_flow["Label"].map({
-            "TcpFlood": 0,
+            "SynFlood": 0,
             "UdpFlood": 1
         }).values
 

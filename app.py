@@ -46,6 +46,15 @@ class IdsConsoleApp:
         self.host_multi.load("Train/hostMulti.pkl")
         self.flow_multi.load("Train/flowMulti.pkl")
 
+        # Check whether multi-class models are valid (trained with >=2 classes)
+        self.host_multi_available = self._is_multi_model_valid(self.host_multi)
+        self.flow_multi_available = self._is_multi_model_valid(self.flow_multi)
+
+        if not self.host_multi_available:
+            print("WARNING: host multi-class model appears to have <2 classes and will not be used. Retrain with host multi-class dataset.")
+        if not self.flow_multi_available:
+            print("WARNING: flow multi-class model appears to have <2 classes and will not be used. Retrain with flow multi-class dataset.")
+
         # Network Config
         self.LOCAL_IP = {"192.168.1.165"}
         self.IFACE = "Ethernet"
@@ -79,6 +88,16 @@ class IdsConsoleApp:
 
         print("IDS Ready.\n")
 
+    def _is_multi_model_valid(self, model) -> bool:
+        """Return True if the loaded sklearn model has at least 2 classes_."""
+        try:
+            classes = getattr(model.model, 'classes_', None)
+            if classes is None:
+                return False
+            return len(classes) >= 2
+        except Exception:
+            return False
+
     def predict_hybrid(self, host_features, flow_features):
 
         # ---------- Preprocess ----------
@@ -95,9 +114,17 @@ class IdsConsoleApp:
         host_multi_output = None
         flow_multi_output = None
 
-        if host_bin_output.label == BinaryLabel.Attack or flow_bin_output.label == BinaryLabel.Attack:
-            host_multi_output = HostMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0],self.host_multi.model.classes_)
-            flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0], self.flow_multi.model.classes_)
+        # Only call multi-class models if binary says attack AND the multi models are actually available
+        if (host_bin_output.label == BinaryLabel.Attack or flow_bin_output.label == BinaryLabel.Attack):
+            if self.host_multi_available:
+                host_multi_output = HostMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0],self.host_multi.model.classes_)
+            else:
+                host_multi_output = None
+
+            if self.flow_multi_available:
+                flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0], self.flow_multi.model.classes_)
+            else:
+                flow_multi_output = None
 
         final_label , confidence  = self.fusion.fuse(
             host_bin_output=host_bin_output,

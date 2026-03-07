@@ -54,8 +54,8 @@ class DecisionFusion:
 
         if isinstance(multi_output, FlowMultiModelOutput):
 
-            if multi_output.label == FlowAttackLabel.TcpFlood:
-                return FinalPredictionLabel.TcpFlood
+            if multi_output.label == FlowAttackLabel.SynFlood:
+                return FinalPredictionLabel.SynFlood
 
             if multi_output.label == FlowAttackLabel.UdpFlood:
                 return FinalPredictionLabel.UdpFlood

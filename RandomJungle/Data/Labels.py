@@ -11,13 +11,13 @@ class HostAttackLabel(IntEnum):
     BruteForce = 3
 
 class FlowAttackLabel(IntEnum):
-    TcpFlood = 0
+    SynFlood = 0
     UdpFlood = 1
 
 class FinalPredictionLabel(IntEnum):
     Benign = 0
 
-    TcpFlood = 1
+    SynFlood = 1
     UdpFlood = 2
 
     SynScan = 3
