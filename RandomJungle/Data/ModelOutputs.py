@@ -17,9 +17,11 @@ class BinaryModelOutput:
     probabilities: Dict[BinaryLabel, float]
 
     @staticmethod
-    def from_proba(probs):
-        p_benign = float(probs[0])
-        p_attack = float(probs[1])
+    def from_proba(probs, classes):
+        prob_map = dict(zip(classes, probs))
+
+        p_benign = float(prob_map.get("Benign", 0))
+        p_attack = float(prob_map.get("Attack", 0))
 
         label = (
             BinaryLabel.Attack if p_attack >= p_benign
@@ -69,22 +71,23 @@ class FlowMultiModelOutput:
     probabilities: Dict[FlowAttackLabel, float]
 
     @staticmethod
-    def from_proba(probs):
-        p_tcpFlood = float(probs[0])
-        p_udpFlood = float(probs[1])
+    def from_proba(probs, classes):
+        prob_map = dict(zip(classes, probs))
 
-        if p_tcpFlood >= p_udpFlood:
-            label = FlowAttackLabel.TcpFlood
-            confidence = p_tcpFlood
-        else:
-            label = FlowAttackLabel.UdpFlood
-            confidence = p_udpFlood
+        p_benign = float(prob_map.get("Benign", 0))
+        p_attack = float(prob_map.get("Attack", 0))
 
-        return FlowMultiModelOutput(
+        label = (
+            BinaryLabel.Attack if p_attack >= p_benign
+            else BinaryLabel.Benign
+        )
+
+        return BinaryModelOutput(
             label=label,
-            confidence=confidence,
+            confidence=max(p_benign, p_attack),
+            attack_probability=p_attack,
             probabilities={
-                FlowAttackLabel.TcpFlood: p_tcpFlood,
-                FlowAttackLabel.UdpFlood: p_udpFlood,
+                BinaryLabel.Benign: p_benign,
+                BinaryLabel.Attack: p_attack,
             }
         )
