@@ -1,6 +1,7 @@
 import time
 import numpy as np
 from dataclasses import asdict
+import os
 
 from NetworkReader.Services.FlowBased.FlowFeatureExtractService import FlowFeatureExtractService
 from NetworkReader.Services.FlowBased.FlowSlidingWindowService import FlowSlidingWindowService
@@ -104,6 +105,48 @@ class IdsConsoleApp:
             host_multi_output=host_multi_output,
             flow_multi_output=flow_multi_output
         )
+
+        # ---------- Local file logging ----------
+        try:
+            log_dir = os.path.join("Logger", "logs")
+            os.makedirs(log_dir, exist_ok=True)
+            log_file = os.path.join(log_dir, "predictions.txt")
+
+            # Prepare feature vector strings (host_multi, flow_multi) — values comma-separated
+            try:
+                host_vec_vals = host_multi_array[0].tolist()
+                host_vec_str = ",".join([str(x) for x in host_vec_vals])
+            except Exception:
+                host_vec_str = "None"
+
+            try:
+                flow_vec_vals = flow_multi_array[0].tolist()
+                flow_vec_str = ",".join([str(x) for x in flow_vec_vals])
+            except Exception:
+                flow_vec_str = "None"
+
+            # Model outputs formatting
+            def fmt_output(out):
+                if out is None:
+                    return "None:0.0"
+                return f"{out.label.name}:{out.confidence:.6f}"
+
+            host_bin_s = fmt_output(host_bin_output)
+            flow_bin_s = fmt_output(flow_bin_output)
+            host_multi_s = fmt_output(host_multi_output)
+            flow_multi_s = fmt_output(flow_multi_output)
+            final_s = f"{final_label.name}:{confidence:.6f}"
+
+            # Single-line record — fields separated by a single space as requested
+            # Order: host_feature_vector flow_feature_vector host_bin flow_bin host_multi flow_multi final
+            line = f"[{host_vec_str}] [{flow_vec_str}] {host_bin_s} {flow_bin_s} {host_multi_s} {flow_multi_s} {final_s}\n"
+
+            with open(log_file, "a", encoding="utf-8") as f:
+                f.write(line)
+        except Exception as e:
+            # Non-fatal: don't break prediction on logging failure
+            print("Logging error:", e)
+
         if final_label != FinalPredictionLabel.Benign:
             print( "Flow bin:", flow_bin_output.label.name, flow_bin_output.confidence)
             if flow_multi_output is not None:
