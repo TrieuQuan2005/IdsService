@@ -2,10 +2,11 @@
 from pathlib import Path
 
 # ===== sửa path tại đây =====
-INPUT_FILE = "HostSsh.csv"
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-OUTPUT_FILE = PROJECT_ROOT / "Dataset/HostSsh.csv"
-LABEL_NAME = "BruteForce"
+INPUT_FILE = PROJECT_ROOT / "Dataset/Helper/HostUdpScan.csv"
+OUTPUT_FILE = PROJECT_ROOT / "Dataset/HostUdpScan.csv"
+LABEL_NAME = "UdpScan"
 LABEL_COLUMN = "Label"
 # ============================
 

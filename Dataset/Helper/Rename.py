@@ -1,8 +1,8 @@
 ﻿import os
 import pandas as pd
 
-INPUT_FOLDER = "OfficalDataset"
-OUTPUT_FOLDER = "OfficalDataset"
+INPUT_FOLDER = "FlowBinDataset"
+OUTPUT_FOLDER = "../FlowBinDataset"
 
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
