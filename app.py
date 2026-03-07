@@ -88,8 +88,8 @@ class IdsConsoleApp:
         host_multi_array = np.array(list(asdict(host_multi_f).values())).reshape(1, -1)
         flow_multi_array = np.array(list(asdict(flow_multi_f).values())).reshape(1, -1)
 
-        host_bin_output = BinaryModelOutput.from_proba(self.host_bin.predict_proba(host_bin_array)[0])
-        flow_bin_output = BinaryModelOutput.from_proba(self.flow_bin.predict_proba(flow_bin_array)[0])
+        host_bin_output = BinaryModelOutput.from_proba(self.host_bin.predict_proba(host_bin_array)[0], self.host_bin.model.classes_)
+        flow_bin_output = BinaryModelOutput.from_proba(self.flow_bin.predict_proba(flow_bin_array)[0],self.flow_bin.model.classes_)
 
         host_multi_output = None
         flow_multi_output = None
@@ -97,7 +97,7 @@ class IdsConsoleApp:
         if host_bin_output.label.value == 1:
             host_multi_output = HostMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0],self.host_multi.model.classes_)
         if flow_bin_output.label.value == 1:
-            flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0])
+            flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0], self.flow_multi.model.classes_)
 
         final_label , confidence  = self.fusion.fuse(
             host_bin_output=host_bin_output,
