@@ -5,6 +5,7 @@ from collections import deque, defaultdict
 from NetworkReader.Data.ValueObjects.HostBased.HostStats import HostStats
 from NetworkReader.Data.ValueObjects.HostBased.HostSlidingWindowSnapshot import HostSlidingWindowSnapshot
 from NetworkReader.Data.ValueObjects.PacketMeta import PacketMeta
+from NetworkReader.Data.Enums.Direction import Direction
 
 
 class HostSlidingWindowService:
@@ -138,9 +139,20 @@ class HostSlidingWindowService:
         stats.total_packets += 1
         stats.total_bytes += pkt.packet_size
 
+        # Use the original destination port for host-level fan-out metrics.
+        # PacketMeta.dst_port may contain the "flow" destination port used by
+        # flow-level normalization (it's set to src_port for BACKWARD packets).
+        # For host metrics we want the actual destination port seen in the packet:
+        # - if direction is FORWARD, the packet.dst_port is the true dst port
+        # - if direction is BACKWARD, the original dst port is stored in pkt.src_port
+        if pkt.direction == Direction.FORWARD:
+            dst_port_for_host = pkt.dst_port
+        else:
+            dst_port_for_host = pkt.src_port
+
         stats.distinct_dst_ips.add(pkt.dst_ip)
-        stats.distinct_dst_ports.add(pkt.dst_port)
-        stats.dst_port_counter[pkt.dst_port] += 1
+        stats.distinct_dst_ports.add(dst_port_for_host)
+        stats.dst_port_counter[dst_port_for_host] += 1
 
         # connection attempts (SYN-only)
         if pkt.syn and not pkt.ack:
