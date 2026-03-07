@@ -183,7 +183,7 @@ class NetworkPipeline:
 # =========================================================
 if __name__ == "__main__":
 
-    LOCAL_IP = {"192.168.1.165"}   # chỉnh lại nếu IP đổi
+    LOCAL_IP = {"172.16.246.83"}   # chỉnh lại nếu IP đổi
     IFACE = "Ethernet"             # đổi nếu dùng WiFi
 
     # I/O
@@ -211,4 +211,4 @@ if __name__ == "__main__":
         host_extractor
     )
 
-    pipe.run(1500)
+    pipe.run(600)
