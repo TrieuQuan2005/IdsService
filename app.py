@@ -14,7 +14,7 @@ from NetworkReader.Services.PacketCaptureService import PacketCaptureService
 from NetworkReader.Services.PacketParserService import PacketParserService
 
 from NetworkReader.NetworkReaderPipeLine import NetworkReader
-from RandomJungle.Data.Labels import FinalPredictionLabel
+from RandomJungle.Data.Labels import FinalPredictionLabel, BinaryLabel
 
 from RandomJungle.Data.ModelOutputs import (
     BinaryModelOutput,
@@ -94,9 +94,9 @@ class IdsConsoleApp:
         host_multi_output = None
         flow_multi_output = None
 
-        if host_bin_output.label.value == 1:
+        if host_bin_output.label == BinaryLabel.Attack:
             host_multi_output = HostMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0],self.host_multi.model.classes_)
-        if flow_bin_output.label.value == 1:
+        if flow_bin_output.label == BinaryLabel.Attack:
             flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0], self.flow_multi.model.classes_)
 
         final_label , confidence  = self.fusion.fuse(
