@@ -94,9 +94,8 @@ class IdsConsoleApp:
         host_multi_output = None
         flow_multi_output = None
 
-        if host_bin_output.label == BinaryLabel.Attack:
+        if host_bin_output.label == BinaryLabel.Attack or flow_bin_output.label == BinaryLabel.Attack:
             host_multi_output = HostMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0],self.host_multi.model.classes_)
-        if flow_bin_output.label == BinaryLabel.Attack:
             flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0], self.flow_multi.model.classes_)
 
         final_label , confidence  = self.fusion.fuse(
