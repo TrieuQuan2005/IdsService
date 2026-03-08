@@ -8,10 +8,10 @@ from RandomJungle.Data.FeatureSets import (
 )
 
 MODEL_FILES = {
-    'hostBin': ('Train/hostBin.pkl', HostBinaryFeatures),
-    'flowBin': ('Train/flowBin.pkl', FlowBinaryFeatures),
-    'hostMulti': ('Train/hostMulti.pkl', HostMultiFeatures),
-    'flowMulti': ('Train/flowMulti.pkl', FlowMultiFeatures),
+    'hostBin': ('../Train/hostBin.pkl', HostBinaryFeatures),
+    'flowBin': ('../Train/flowBin.pkl', FlowBinaryFeatures),
+    'hostMulti': ('../Train/hostMulti.pkl', HostMultiFeatures),
+    'flowMulti': ('../Train/flowMulti.pkl', FlowMultiFeatures),
 }
 
 

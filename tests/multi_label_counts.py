@@ -1,6 +1,6 @@
 import pandas as pd
 
-paths = ['Dataset/FlowMultiDataset.csv','Dataset/HostMultiDataset.csv']
+paths = ['../Dataset/FlowMultiDataset.csv','../Dataset/HostMultiDataset.csv']
 for p in paths:
     try:
         df = pd.read_csv(p)

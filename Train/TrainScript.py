@@ -7,25 +7,25 @@ def main():
     dest_dir = PROJECT_ROOT / "Train"
 
     FlowBinTrainer = RfTrainer(
-        str(PROJECT_ROOT / "Dataset/FlowBinDataset.normalized.csv"),
+        str(PROJECT_ROOT / "Dataset/FlowBinDataset.csv"),
         str(dest_dir)
     )
     FlowBinTrainer.train_flow_binary()
 
     HostBinTrainer = RfTrainer(
-        str(PROJECT_ROOT / "Dataset/HostBinDataset.normalized.csv"),
+        str(PROJECT_ROOT / "Dataset/HostBinDataset.csv"),
         str(dest_dir)
     )
     HostBinTrainer.train_host_binary()
 
     FlowMultiTrainer = RfTrainer(
-        str(PROJECT_ROOT / "Dataset/FlowMultiDataset.normalized.csv"),
+        str(PROJECT_ROOT / "Dataset/FlowMultiDataset.csv"),
         str(dest_dir)
     )
     FlowMultiTrainer.train_flow_multi()
 
     HostMultiTrainer = RfTrainer(
-        str(PROJECT_ROOT / "Dataset/HostMultiDataset.normalized.csv"),
+        str(PROJECT_ROOT / "Dataset/HostMultiDataset.csv"),
         str(dest_dir)
     )
     HostMultiTrainer.train_host_multi()

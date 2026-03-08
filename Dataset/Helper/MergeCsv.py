@@ -45,14 +45,12 @@ def merge_csv_with_individual_sampling(
 
 if __name__ == "__main__":
     files_config = [
-        ("HostBenign.csv", 36000),
-        ("HostFullScan.csv", 9000),
-        ("HostSshBruteForce.csv", 9000),
-        ("HostSynScan.csv", 9000),
-        ("HostUdpScan.csv", 9000),
+        ("FlowSynFlood.csv", 9000),
+        ("FlowUdpFlood.csv", 9000),
+
     ]
 
     merge_csv_with_individual_sampling(
         files_with_count=files_config,
-        output_file="../HostBinDataset.csv"
+        output_file="../FlowMultiDataset.csv"
     )

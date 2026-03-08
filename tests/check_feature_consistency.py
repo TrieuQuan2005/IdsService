@@ -19,5 +19,6 @@ if __name__ == '__main__':
     check(FlowBinaryFeatures)
     check(HostMultiFeatures)
     check(FlowMultiFeatures)
+
     print('All feature sets consistent')
 
