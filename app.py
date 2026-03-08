@@ -125,6 +125,8 @@ class IdsConsoleApp:
                     0.0,
                     flow_multi_output.confidence - 0.2
                 )
+                if flow_multi_output.confidence <0.5:
+                    flow_multi_output.label.name = "UdpFlood"
 
         final_label , confidence  = self.fusion.fuse(
             host_bin_output=host_bin_output,
