@@ -21,6 +21,7 @@ class FlowFeatureVector:
 
     # direction
     forward_ratio: float
+    protocol : int
 
     # TCP behavior
     syn_ratio: float

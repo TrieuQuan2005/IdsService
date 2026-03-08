@@ -76,6 +76,7 @@ class Preprocessor:
             forward_ratio=self._clip_ratio(f.forward_ratio),
             syn_ratio=self._clip_ratio(f.syn_ratio),
             rst_ratio=self._clip_ratio(f.rst_ratio),
+            protocol=self._clean_int(f.protocol)
         )
 
     def _clean_numeric(self,value: float,min_val: float = 0.0,max_val: float = None) -> float:

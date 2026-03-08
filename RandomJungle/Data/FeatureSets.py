@@ -103,7 +103,7 @@ class FlowMultiFeatures:
     forward_ratio: float
     syn_ratio: float
     rst_ratio: float
-    protocol: L4Protocol
+    protocol: int
     FEATURE_NAMES = [
         "packets_per_second",
         "bytes_per_second",
@@ -122,6 +122,6 @@ class FlowMultiFeatures:
             float(self.forward_ratio),
             float(self.syn_ratio),
             float(self.rst_ratio),
-            float(self.protocol.value)
+            float(self.protocol)
         ], dtype=np.float32)
 
