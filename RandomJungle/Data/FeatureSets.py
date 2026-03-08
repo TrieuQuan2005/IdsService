@@ -4,6 +4,9 @@ from dataclasses import dataclass
 from typing import List
 import numpy as np
 
+from NetworkReader.Data.Enums.L4Protocol import L4Protocol
+
+
 @dataclass(slots=True)
 class HostBinaryFeatures:
     unique_dst_ports: int
@@ -100,7 +103,7 @@ class FlowMultiFeatures:
     forward_ratio: float
     syn_ratio: float
     rst_ratio: float
-
+    protocol: L4Protocol
     FEATURE_NAMES = [
         "packets_per_second",
         "bytes_per_second",
@@ -108,6 +111,7 @@ class FlowMultiFeatures:
         "forward_ratio",
         "syn_ratio",
         "rst_ratio",
+        "protocol"
     ]
 
     def to_array(self) -> np.ndarray:
@@ -118,5 +122,6 @@ class FlowMultiFeatures:
             float(self.forward_ratio),
             float(self.syn_ratio),
             float(self.rst_ratio),
+            float(self.protocol.value)
         ], dtype=np.float32)
 
