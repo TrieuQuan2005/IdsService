@@ -89,7 +89,7 @@ class FlowSlidingWindowService:
             stats.fwd_packets += 1
         else:
             stats.bwd_packets += 1
-
+        stats.protocol = pkt.protocol.value
         # inter-arrival time (Welford)
         if stats.last_pkt_ts is not None:
             delta = ts - stats.last_pkt_ts

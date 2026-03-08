@@ -15,6 +15,7 @@ class FlowStats:
     inter_arrival_m2: float = 0.0
     inter_arrival_count: int = 0
 
+    protocol: int = 6
     # TCP flags
     syn_count: int = 0
     ack_count: int = 0

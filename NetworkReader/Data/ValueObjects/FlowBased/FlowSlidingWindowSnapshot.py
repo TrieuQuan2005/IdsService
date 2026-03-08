@@ -3,6 +3,8 @@ from NetworkReader.Data.ValueObjects.FlowBased.FlowKey import FlowKey
 
 @dataclass(frozen=True, slots=True)
 class FlowSlidingWindowSnapshot:
+
+
     # identity
     flow_key: FlowKey
 
@@ -21,7 +23,7 @@ class FlowSlidingWindowSnapshot:
     flow_duration: float
     inter_arrival_mean: float
     inter_arrival_variance: float
-
+    protocol : int
     # TCP behavior
     syn_count: int
     ack_count: int

@@ -32,4 +32,5 @@ class FlowFeatureExtractService:
 
             syn_ratio=float(snapshot.syn_ratio),
             rst_ratio=float(snapshot.rst_ratio),
+            protocol=snapshot.protocol
         )
