@@ -167,17 +167,8 @@ class FlowMultiModelOutput:
         if classes is None:
             label = FlowAttackLabel(idx)
         else:
-            try:
-                c = classes[idx]
-                try:
-                    label = FlowAttackLabel(int(c))
-                except Exception:
-                    try:
-                        label = FlowAttackLabel[c]
-                    except Exception:
-                        label = FlowAttackLabel(idx)
-            except Exception:
-                label = FlowAttackLabel(idx)
+            c = classes[idx]
+            label = FlowAttackLabel(int(c))
 
         probabilities = {}
         for i, p in enumerate(probs):

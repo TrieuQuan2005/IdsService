@@ -108,6 +108,8 @@ class IdsConsoleApp:
         host_multi_array = np.array(list(asdict(host_multi_f).values())).reshape(1, -1)
         flow_multi_array = np.array(list(asdict(flow_multi_f).values())).reshape(1, -1)
 
+
+
         host_bin_output = BinaryModelOutput.from_proba(self.host_bin.predict_proba(host_bin_array)[0], self.host_bin.model.classes_)
         flow_bin_output = BinaryModelOutput.from_proba(self.flow_bin.predict_proba(flow_bin_array)[0],self.flow_bin.model.classes_)
 
@@ -117,16 +119,24 @@ class IdsConsoleApp:
         # Only call multi-class models if binary says attack AND the multi models are actually available
         if host_bin_output.label == BinaryLabel.Attack:
             host_multi_output = HostMultiModelOutput.from_proba(self.host_multi.predict_proba(host_multi_array)[0],self.host_multi.model.classes_)
+
+            print(host_features.syn_ratio)
+            if host_multi_output.label.name != "BruteForce":
+                if host_features.syn_ratio >= 0:
+                    host_multi_output.label = FinalPredictionLabel.UdpScan
+                if host_features.syn_ratio > 0.8:
+                    host_multi_output.label = FinalPredictionLabel.FullScan
+                if host_features.syn_ratio > 0.95:
+                    host_multi_output.label = FinalPredictionLabel.SynScan
+
         if flow_bin_output.label == BinaryLabel.Attack:
             flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0], self.flow_multi.model.classes_)
 
-            if flow_multi_output.label.name == "SynFlood":
-                flow_multi_output.confidence = max(
-                    0.0,
-                    flow_multi_output.confidence - 0.2
-                )
-                if flow_multi_output.confidence <0.5:
-                    flow_multi_output.label.name = "UdpFlood"
+            protocol = flow_features.protocol
+
+            if flow_multi_output.label.name == "SynFlood" and protocol != 6:
+                flow_multi_output.label = FinalPredictionLabel.UdpFlood
+
 
         final_label , confidence  = self.fusion.fuse(
             host_bin_output=host_bin_output,
@@ -222,7 +232,8 @@ class IdsConsoleApp:
                 break
 
             except Exception as e:
-                print("Error:", e)
+                print(e)
+                break
 
 
 if __name__ == "__main__":

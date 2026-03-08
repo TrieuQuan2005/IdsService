@@ -6,6 +6,7 @@ from RandomJungle.Data.Labels import (
 )
 
 from RandomJungle.Data.ModelOutputs import (
+    BinaryModelOutput,
     HostMultiModelOutput,
     FlowMultiModelOutput,
 )
@@ -26,34 +27,24 @@ class DecisionFusion:
                 flow_bin_output.label == BinaryLabel.Benign):
             return FinalPredictionLabel.Benign, 1.0
 
-        candidates = []
-
+        candidates= []
         # Flow attack
         if flow_bin_output.label == BinaryLabel.Attack and flow_multi_output is not None:
-            candidates.append(
-                (self._map_to_final(flow_multi_output), flow_multi_output.confidence)
-            )
+            candidates.append((self._map_to_final(flow_multi_output), flow_multi_output.confidence))
 
         # Host attack
         if host_bin_output.label == BinaryLabel.Attack and host_multi_output is not None:
-            candidates.append(
-                (self._map_to_final(host_multi_output), host_multi_output.confidence)
-            )
+            candidates.append( (self._map_to_final(host_multi_output), host_multi_output.confidence))
 
-        # Nếu có 2 candidate → chọn confidence cao hơn
-        if len(candidates) == 2:
-            flowScore = flow_bin_output.confidence*candidates[0][1]
-            host_score = host_bin_output.confidence*candidates[1][1]
-            if flowScore>= host_score:
+        if len(candidates) == 1:
+            return candidates[0]
+        elif len(candidates) == 2:
+            if host_multi_output.label.name == "SynScan" and flow_multi_output.label.name == "SynFlood":
+                return FinalPredictionLabel.FullScan, 0.8
+            if flow_bin_output.confidence > host_bin_output.confidence:
                 return candidates[0]
             else:
                 return candidates[1]
-
-        # Nếu chỉ có 1 candidate
-        if len(candidates) == 1:
-            return candidates[0]
-
-        # Không đủ thông tin
         return FinalPredictionLabel.Suspicious, 0.5
 
     # Map multi-class output → FinalPredictionLabel
@@ -62,21 +53,21 @@ class DecisionFusion:
 
         if isinstance(multi_output, HostMultiModelOutput):
 
-            if multi_output.label == HostAttackLabel.SynScan:
+            if multi_output.label.name ==  "SynScan":
                 return FinalPredictionLabel.SynScan
-            if multi_output.label == HostAttackLabel.UdpScan:
+            if multi_output.label.name == "UdpScan" :
                 return FinalPredictionLabel.UdpScan
-            if multi_output.label == HostAttackLabel.FullScan:
+            if multi_output.label.name == "FullScan":
                 return FinalPredictionLabel.FullScan
-            if multi_output.label == HostAttackLabel.BruteForce:
+            if multi_output.label.name == "BruteForce":
                 return FinalPredictionLabel.BruteForce
 
         if isinstance(multi_output, FlowMultiModelOutput):
 
-            if multi_output.label == FlowAttackLabel.SynFlood:
+            if multi_output.label.name == "SynFlood":
                 return FinalPredictionLabel.SynFlood
 
-            if multi_output.label == FlowAttackLabel.UdpFlood:
+            if multi_output.label.name == "UdpFlood":
                 return FinalPredictionLabel.UdpFlood
 
         return FinalPredictionLabel.Suspicious
