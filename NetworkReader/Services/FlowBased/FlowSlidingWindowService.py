@@ -167,4 +167,5 @@ class FlowSlidingWindowService:
                 stats.rst_count / stats.total_packets
                 if stats.total_packets > 0 else 0.0
             ),
+            protocol=stats.protocol,
         )
