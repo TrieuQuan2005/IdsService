@@ -120,6 +120,12 @@ class IdsConsoleApp:
         if flow_bin_output.label == BinaryLabel.Attack:
             flow_multi_output = FlowMultiModelOutput.from_proba(self.flow_multi.predict_proba(flow_multi_array)[0], self.flow_multi.model.classes_)
 
+            if flow_multi_output.label.name == "SynFlood":
+                flow_multi_output.confidence = max(
+                    0.0,
+                    flow_multi_output.confidence - 0.2
+                )
+
         final_label , confidence  = self.fusion.fuse(
             host_bin_output=host_bin_output,
             flow_bin_output=flow_bin_output,
